@@ -12,6 +12,7 @@ Grab the Vault token from the output of the above, and run:
 
 ```bash
 export VAULT_TOKEN=<TOKEN HERE>
+export VAULT_ADDR=http://127.0.0.1:8200
 ```
 
 Then you can configure vault for ssh OTP:
