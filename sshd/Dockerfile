@@ -23,8 +23,8 @@ RUN chmod 0755 /usr/bin/pam-user-create
 
 # Configure PAM
 RUN sed -ri 's/^@include common-auth/#@include common-auth/' /etc/pam.d/sshd
-RUN echo "auth required pam_exec.so quiet log=/var/log/pam.log /usr/bin/pam-user-create" >> /etc/pam.d/sshd
-RUN echo "auth requisite pam_exec.so quiet expose_authtok log=/var/log/helper.log /usr/local/bin/vault-ssh-helper -dev -config=/etc/vault-ssh-helper.d/config.hcl" >> /etc/pam.d/sshd
+RUN echo "auth optional pam_exec.so quiet log=/var/log/pam.log /usr/bin/pam-user-create" >> /etc/pam.d/sshd
+RUN echo "auth requisite pam_exec.so debug quiet expose_authtok log=/var/log/helper.log /usr/local/bin/vault-ssh-helper -dev -config=/etc/vault-ssh-helper.d/config.hcl" >> /etc/pam.d/sshd
 RUN echo "auth optional pam_unix.so not_set_pass use_first_pass nodelay" >> /etc/pam.d/sshd
 
 # Configure SSHD
