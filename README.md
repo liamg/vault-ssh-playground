@@ -2,20 +2,32 @@
 
 This includes two containers, one running Vault and another running sshd on Ubuntu. 
 
-Start them up:
+The sshd container has been configured to automatically create non-existant users on SSH login. This currently requires the user to initially attempt to authenticate twice, as the first attempt sshd will not have information about the uid/guid of the freshly created user.
 
-```bash
+## Setup
+
+```
 docker-compose up --build
 ```
 
-Grab the Vault token from the output of the above, and run:
+and in separate terminal:
 
-```bash
-export VAULT_TOKEN=<TOKEN HERE>
-export VAULT_ADDR=http://127.0.0.1:8200
+```
+./init.sh
 ```
 
-Then you can configure vault for ssh OTP:
+then you can
+
+```
+ssh liam-2001@127.0.0.1 -p2222
+```
+
+(you will need to attempt to ssh in twice, as the first attempt will always fail)
+
+
+### Configuring SSH OTP
+
+Now you can configure vault to provide OTPs for ssh:
 
 ```bash
 vault secrets enable ssh

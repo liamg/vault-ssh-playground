@@ -1,2 +1,4 @@
 #!/bin/bash
-adduser $PAM_USER --disabled-password --quiet --gecos ""
+uid=$(echo $PAM_USER | sed 's/[^\-]*\-//g')
+adduser $PAM_USER -u $uid --disabled-password --quiet --gecos "" || true
+exit 0

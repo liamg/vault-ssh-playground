@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN apt update && apt install -y unzip openssh-server vim 
+RUN apt update && apt install -y unzip openssh-server vim rsyslog
 
 # Download the vault-ssh-helper
 RUN wget https://releases.hashicorp.com/vault-ssh-helper/0.1.4/vault-ssh-helper_0.1.4_linux_amd64.zip
@@ -23,8 +23,9 @@ RUN chmod 0755 /usr/bin/pam-user-create
 
 # Configure PAM
 RUN sed -ri 's/^@include common-auth/#@include common-auth/' /etc/pam.d/sshd
-RUN echo "auth optional pam_exec.so quiet log=/var/log/pam.log /usr/bin/pam-user-create" >> /etc/pam.d/sshd
-RUN echo "auth requisite pam_exec.so debug quiet expose_authtok log=/var/log/helper.log /usr/local/bin/vault-ssh-helper -dev -config=/etc/vault-ssh-helper.d/config.hcl" >> /etc/pam.d/sshd
+RUN echo "auth required pam_exec.so quiet log=/var/log/pam.log /usr/bin/pam-user-create" >> /etc/pam.d/sshd
+RUN echo "auth optional pam_unix.so not_set_pass use_first_pass nodelay" >> /etc/pam.d/sshd
+RUN echo "auth requisite pam_exec.so debug quiet expose_authtok log=/var/log/helper.log /usr/local/bin/vault-ssh-helper -config=/etc/vault-ssh-helper.d/config.hcl" >> /etc/pam.d/sshd
 RUN echo "auth optional pam_unix.so not_set_pass use_first_pass nodelay" >> /etc/pam.d/sshd
 
 # Configure SSHD
@@ -37,6 +38,11 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Expose ssh port
 EXPOSE 22
+
+RUN touch /etc/pam_debug
+RUN echo "*.debug     /var/log/debug.log" >> /etc/rsyslog.conf
+RUN /etc/init.d/rsyslog restart
+RUN /etc/init.d/rsyslog restart
 
 # Start sshd
 CMD    ["/usr/sbin/sshd", "-D"]
